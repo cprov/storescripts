@@ -85,11 +85,10 @@ def main():
     else:
         snap_name = 'lxd'
 
-    print('Collecting publisher metrics for {} ...'.format(snap_name))
-
     try:
         with open('store.auth') as fd:
             authorization = fd.read().strip()
+        print('Using authorization from `store.auth` file ...')
     except FileNotFoundError:
         print('Missing authorization! Please run the following command:')
         print()
@@ -102,13 +101,14 @@ def main():
               'to the `store.auth` file')
         return
 
+    print('Collecting publisher metrics for {} ...'.format(snap_name))
     raw_absolute = get_publisher_metrics(
         snap_name, 'weekly_installed_base_by_operating_system', authorization)
     absolute = collections.OrderedDict(
         sorted(raw_absolute.items(), key=lambda t: t[1] or -1, reverse=True))
     log = transform_to_log_ratio(absolute)
 
-    print('Collecting public metric for {} ...'.format(snap_name))
+    print('Collecting public metrics for {} ...'.format(snap_name))
     raw_percent = get_public_metrics(
         snap_name, 'weekly_installed_base_by_operating_system_percent')
     percent = collections.OrderedDict(
@@ -123,7 +123,7 @@ def main():
         ('Absolute', [v or '-' for v in absolute.values()]),
         ('Log10 scale', [v or '-' for v in log.values()]),
         ('Linear', [v or '-' for v in percent.values()]),
-        ('Linear (local)', [v or '-' for v in transform_to_ratio(absolute).values()]),
+        #('Linear (local)', [v or '-' for v in transform_to_ratio(absolute).values()]),
         ('Log10 from Linear', [v or '-' for v in log_from_percent.values()]),
     ])
     print(tabulate.tabulate(table, headers='keys'))
