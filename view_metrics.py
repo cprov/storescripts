@@ -87,13 +87,13 @@ def main():
 
     try:
         with open('store.auth') as fd:
-            authorization = fd.read().strip()
+            authorization = fd.read().strip().replace('\n', '')
         print('Using authorization from `store.auth` file ...')
     except FileNotFoundError:
         print('Missing authorization! Please run the following command:')
         print()
         print('\t$ snap install surl')
-        print('\t$ surl -v -e <...> -s production -p package-upload '
+        print('\t$ surl -v -e <email> -s production -p package_upload '
               'https://dashboard.snapcraft.io/dev/api/account')
         print('\t...')
         print()
