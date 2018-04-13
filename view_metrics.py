@@ -94,7 +94,8 @@ def main():
         print('Missing authorization! Please run the following command:')
         print()
         print('\t$ snap install surl')
-        print('\t$ surl -v -e <email> -s production -p package_upload '
+        print('\t$ surl -v -e <email> -s production '
+              '-p package_access -p package_metrics '
               'https://dashboard.snapcraft.io/dev/api/account')
         print('\t...')
         print()
