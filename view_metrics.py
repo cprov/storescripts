@@ -79,6 +79,29 @@ def transform_to_log_ratio(samples):
     return collections.OrderedDict(ratios)
 
 
+def transform_to_magic_ratio(samples):
+    total = sum(v for v in samples.values() if v is not None)
+    sorted_samples = sorted(samples.items(), key=lambda t: t[1] or -1, reverse=True)
+
+    # Normalize with Log10 ratio.
+    ratios = [
+        (k, math.log10(v) / math.log10(total) if v is not None and v > 1 else None)
+        for k, v in sorted_samples]
+
+    # Drop lower samples lower than 25 %.
+    ratios = [
+        (k, v if v is not None and v >= .25 else None)
+        for k, v in ratios]
+
+    # Shift according to the top sample with 5 % precision.
+    _, top_sample = ratios[0]
+    ratios = [
+        (k, round((v + (1 - top_sample)) * 20) / 20 if v is not None else None)
+        for k, v in ratios]
+
+    return collections.OrderedDict(ratios)
+
+
 def main():
 
     if len(sys.argv) > 1:
@@ -109,6 +132,7 @@ def main():
     absolute = collections.OrderedDict(
         sorted(raw_absolute.items(), key=lambda t: t[1] or -1, reverse=True))
     log = transform_to_log_ratio(absolute)
+    magic = transform_to_magic_ratio(absolute)
 
     print('Collecting public metrics for {} ...'.format(snap_name))
     raw_percent = get_public_metrics(
@@ -123,10 +147,11 @@ def main():
     table = collections.OrderedDict([
         ('Distro', absolute.keys()),
         ('Absolute', [v or '-' for v in absolute.values()]),
-        ('Log10 scale', [v or '-' for v in log.values()]),
+        #('Log10 scale', [v or '-' for v in log.values()]),
+        ('Magic scale', [v or '-' for v in magic.values()]),
         ('Linear', [v or '-' for v in percent.values()]),
         #('Linear (local)', [v or '-' for v in transform_to_ratio(absolute).values()]),
-        ('Log10 from Linear', [v or '-' for v in log_from_percent.values()]),
+        #('Log10 from Linear', [v or '-' for v in log_from_percent.values()]),
     ])
     print(tabulate.tabulate(table, headers='keys'))
 
