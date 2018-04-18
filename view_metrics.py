@@ -83,20 +83,25 @@ def transform_to_magic_ratio(samples):
     total = sum(v for v in samples.values() if v is not None)
     sorted_samples = sorted(samples.items(), key=lambda t: t[1] or -1, reverse=True)
 
-    # Normalize with Log10 ratio.
+    # Drop any sample smaller than 5.
     ratios = [
-        (k, math.log10(v) / math.log10(total) if v is not None and v > 1 else None)
+        (k, v if v is not None and v >= 5 else None)
         for k, v in sorted_samples]
 
-    # Drop lower samples lower than 25 %.
+    # Normalize as Log10 ratio of the total.
     ratios = [
-        (k, v if v is not None and v >= .25 else None)
+        (k, math.log10(v) / math.log10(total) if v is not None else None)
         for k, v in ratios]
 
-    # Shift according to the top sample with 5 % precision.
+    # Shift with the top sample complement to 1.
     _, top_sample = ratios[0]
     ratios = [
-        (k, round((v + (1 - top_sample)) * 20) / 20 if v is not None else None)
+        (k, v + (1 - top_sample) if v is not None else None)
+        for k, v in ratios]
+
+    # Round up with 5 % precision.
+    ratios = [
+        (k, math.ceil(v  * 20) / 20 if v is not None else None)
         for k, v in ratios]
 
     return collections.OrderedDict(ratios)
@@ -147,9 +152,9 @@ def main():
     table = collections.OrderedDict([
         ('Distro', absolute.keys()),
         ('Absolute', [v or '-' for v in absolute.values()]),
-        #('Log10 scale', [v or '-' for v in log.values()]),
+        ('Log10 scale', [v or '-' for v in log.values()]),
         ('Magic scale', [v or '-' for v in magic.values()]),
-        ('Linear', [v or '-' for v in percent.values()]),
+        #('Linear', [v or '-' for v in percent.values()]),
         #('Linear (local)', [v or '-' for v in transform_to_ratio(absolute).values()]),
         #('Log10 from Linear', [v or '-' for v in log_from_percent.values()]),
     ])
