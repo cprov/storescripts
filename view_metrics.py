@@ -101,7 +101,7 @@ def transform_to_magic_ratio(samples):
 
     # Round up with 5 % precision.
     ratios = [
-        (k, math.ceil(v  * 20) / 20 if v is not None else None)
+        (k, math.ceil(v  * 40) / 40 if v is not None else None)
         for k, v in ratios]
 
     return collections.OrderedDict(ratios)
@@ -149,8 +149,12 @@ def main():
         (k, v * 1000 if v is not None else None) for k, v in percent.items()])
     log_from_percent = transform_to_log_ratio(amplified_percent)
 
+
+    keys = [
+        k + '\u2013' if k.endswith('/') else k for k in absolute.keys()]
+
     table = collections.OrderedDict([
-        ('Distro', absolute.keys()),
+        ('Distro', keys),
         ('Absolute', [v or '-' for v in absolute.values()]),
         ('Log10 scale', [v or '-' for v in log.values()]),
         ('Magic scale', [v or '-' for v in magic.values()]),
