@@ -79,7 +79,7 @@ def transform_to_log_ratio(samples):
     return collections.OrderedDict(ratios)
 
 
-def transform_to_magic_ratio(samples):
+def transform_to_normalized(samples):
     total = sum(v for v in samples.values() if v is not None)
     sorted_samples = sorted(samples.items(), key=lambda t: t[1] or -1, reverse=True)
 
@@ -99,7 +99,7 @@ def transform_to_magic_ratio(samples):
         (k, v + (1 - top_sample) if v is not None else None)
         for k, v in ratios]
 
-    # Round up with 5 % precision.
+    # Round up with 2.5 % precision.
     ratios = [
         (k, math.ceil(v  * 40) / 40 if v is not None else None)
         for k, v in ratios]
@@ -136,31 +136,19 @@ def main():
         snap_name, 'weekly_installed_base_by_operating_system', authorization)
     absolute = collections.OrderedDict(
         sorted(raw_absolute.items(), key=lambda t: t[1] or -1, reverse=True))
-    log = transform_to_log_ratio(absolute)
-    magic = transform_to_magic_ratio(absolute)
 
     print('Collecting public metrics for {} ...'.format(snap_name))
-    raw_percent = get_public_metrics(
-        snap_name, 'weekly_installed_base_by_operating_system_percent')
-    percent = collections.OrderedDict(
-        sorted(raw_percent.items(), key=lambda t: t[1] or -1, reverse=True))
-
-    amplified_percent = collections.OrderedDict([
-        (k, v * 1000 if v is not None else None) for k, v in percent.items()])
-    log_from_percent = transform_to_log_ratio(amplified_percent)
-
-
-    keys = [
-        k + '\u2013' if k.endswith('/') else k for k in absolute.keys()]
+    raw_normalized = get_public_metrics(
+        snap_name, 'weekly_installed_base_by_operating_system_normalized')
+    normalized = collections.OrderedDict(
+        sorted(raw_normalized.items(), key=lambda t: t[1] or -1, reverse=True))
 
     table = collections.OrderedDict([
-        ('Distro', keys),
-        ('Absolute', [v or '-' for v in absolute.values()]),
-        ('Log10 scale', [v or '-' for v in log.values()]),
-        ('Magic scale', [v or '-' for v in magic.values()]),
-        #('Linear', [v or '-' for v in percent.values()]),
-        #('Linear (local)', [v or '-' for v in transform_to_ratio(absolute).values()]),
-        #('Log10 from Linear', [v or '-' for v in log_from_percent.values()]),
+        ('Distro', absolute.keys()),
+        ('Absolute', absolute.values()),
+        ('Normalized', normalized.values()),
+        #('Log10', [v or '-' for v in  transform_to_log_ratio(absolute).values()]),
+        #('Normalized (local)', [v or '-' for v in transform_to_normalized(absolute).values()]),
     ])
     print(tabulate.tabulate(table, headers='keys'))
 
