@@ -82,6 +82,9 @@ def get_deltas(snap_id, architecture, source_revisions, candidate):
         'snap-id': snap_id,
         'revision': src,
         'tracking-channel': candidate,
+        # Use the instance-key to carry src_revision information, so
+        # results can be identified and sorted later even if no deltas
+        # are available.
         'instance-key': str(src),
     } for src in source_revisions]
 
@@ -141,8 +144,10 @@ def main():
     print('Promoting: {}'.format(args.candidate))
     print('Candidate: {} ({})'.format(
         candidate_revision, humanize.naturalsize(candidate_size, gnu=True)))
+
+    # Walk throught results in revision ASC (numeric) order.
     print('Deltas:')
-    for r in results:
+    for r in sorted(results, key=lambda r: int(r['instance-key'])):
         src = r['instance-key']
         if r['snap']['download']['deltas']:
             delta_size = r['snap']['download']['deltas'][0]['size']
