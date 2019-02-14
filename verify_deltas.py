@@ -9,6 +9,10 @@ import requests
 
 
 RELEASED_REVISIONS = {
+    # The core snap is seeded in Ubuntu Desktop 18.04 (4486), 18.04.1 (4917),
+    # 18.10 (5662). It is also present in Ubuntu Server "live" images from
+    # 18.04 and possibly some cloud images, accounting for the large number of
+    # "baked" revisions we have identified.
     ('core', 'amd64'): [
         4830,
         4917,
@@ -19,6 +23,38 @@ RELEASED_REVISIONS = {
         5897,
         6034,
         6130,
+    ],
+    # The Gnome snaps are only seeded in Ubuntu Desktop images, and some have
+    # the same revision, accounting for some having only 2 baked revisions over
+    # 3 images.
+    ('gnome-3-26-1604', 'amd64'): [
+        49,
+        70,
+    ],
+    ('gnome-calculator', 'amd64'): [
+        154,
+        180,
+        238,
+    ],
+    ('gnome-characters', 'amd64'): [
+        69,
+        103,
+        124,
+    ],
+    ('gnome-logs', 'amd64'): [
+        25,
+        37,
+        45,
+    ],
+    ('gnome-system-monitor', 'amd64'): [
+        36,
+        51,
+        57,
+    ],
+    # This is only seeded on 18.04.1 and 18.10
+    ('gtk-common-themes', 'amd64'): [
+        319,
+        701,
     ],
 }
 

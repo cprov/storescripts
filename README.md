@@ -2,6 +2,13 @@
 
 Snap store random collection of scripts
 
+## Setup
+
+```
+$ python3 -mvenv storescripts
+$ . storescripts/bin/activate
+$ pip install -r requirements.txt
+```
 
 ## `verify_deltas.py`
 
