@@ -144,8 +144,9 @@ def main():
         sorted(raw_normalized.items(), key=lambda t: t[1] or -1, reverse=True))
 
     table = collections.OrderedDict([
-        ('Distro', absolute.keys()),
-        ('Absolute', absolute.values()),
+        #('Distro', absolute.keys()),
+        #('Absolute', absolute.values()),
+        ('Distro', normalized.keys()),
         ('Normalized', normalized.values()),
         #('Log10', [v or '-' for v in  transform_to_log_ratio(absolute).values()]),
         #('Normalized (local)', [v or '-' for v in transform_to_normalized(absolute).values()]),
