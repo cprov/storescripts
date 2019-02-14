@@ -1,0 +1,3 @@
+# requirements for the storescripts project.
+humanize
+requests
